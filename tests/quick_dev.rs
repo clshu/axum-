@@ -1,6 +1,7 @@
 #![allow(unused)]
 
 use anyhow::Result;
+use serde_json::json;
 
 const ADDR: &str = "http://localhost:3000";
 
@@ -8,9 +9,17 @@ const ADDR: &str = "http://localhost:3000";
 async fn quick_dev() -> Result<()> {
     let hc = httpc_test::new_client(ADDR)?;
 
-    hc.do_get("/hello?name=Jen").await?.print().await?;
     hc.do_get("/hello2/Mike").await?.print().await?;
-    hc.do_get("/src/main.rs").await?.print().await?;
+
+    let req_login = hc.do_post(
+        "/api/login",
+        json!({
+            "username": "demo1",
+            "password": "web123"
+        }),
+    );
+
+    req_login.await?.print().await?;
 
     Ok(())
 }
