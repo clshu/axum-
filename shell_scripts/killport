@@ -1,0 +1,8 @@
+#!/bin/zsh
+# Mac OS
+# kill a process listening to a particular port
+#
+echo "killport <process partial name> <port number>"
+PID=`sudo lsof -i :$2 | grep $1 | awk '{ print $2 }'`
+echo "PID=${PID}"
+sudo kill -9 ${PID}
