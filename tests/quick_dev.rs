@@ -15,7 +15,7 @@ async fn quick_dev() -> Result<()> {
         "/api/login",
         json!({
             "username": "demo1",
-            "password": "web123"
+            "password": "web"
         }),
     );
 
