@@ -2,8 +2,9 @@
 
 pub use self::error::{Error, Result};
 use axum::extract::{Path, Query};
+use axum::middleware;
 // use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use axum::response::{Html, IntoResponse};
+use axum::response::{Html, IntoResponse, Response};
 use axum::routing::get_service;
 use axum::{routing::get, Router};
 use serde::Deserialize;
@@ -18,6 +19,7 @@ async fn main() {
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(routes)
+        .layer(middleware::map_response(main_response_mapper))
         .fallback_service(routes_static());
 
     let addr_port = "0.0.0.0:3000";
@@ -25,6 +27,13 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(addr_port).await.unwrap();
     println!("->> LISTENING on {addr_port}\n");
     axum::serve(listener, routes_all).await.unwrap();
+}
+
+// Mapper as a middileware
+async fn main_response_mapper(res: Response) -> Response {
+    println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
+    println!();
+    res
 }
 
 // Routes start -- Route hello*
