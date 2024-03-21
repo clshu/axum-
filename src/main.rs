@@ -16,11 +16,14 @@ mod model;
 mod web;
 
 #[tokio::main]
-async fn main() {
-    let routes = web::routes_login::routes();
+async fn main() -> Result<()> {
+    // Initialize ModelController
+    let mc = model::ModelController::new().await?;
+
     let routes_all = Router::new()
         .merge(routes_hello())
-        .merge(routes)
+        .merge(web::routes_login::routes())
+        .nest("/api", web::routes_tickets::routes(mc.clone()))
         // middleware layers are executed from bottom to top
         .layer(middleware::map_response(main_response_mapper))
         .layer(CookieManagerLayer::new())
@@ -31,6 +34,8 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(addr_port).await.unwrap();
     println!("->> LISTENING on {addr_port}\n");
     axum::serve(listener, routes_all).await.unwrap();
+
+    Ok(())
 }
 
 // Mapper as a middileware
